@@ -1,36 +1,33 @@
 import SwiftUI
 
 struct SettingsView: View {
-    @EnvironmentObject var dataStore: DataStore
+    @EnvironmentObject var datastore: DataStore
 
     var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Profile")) {
-                    Picker("Select Profile", selection: $dataStore.currentProfileID) {
-                        ForEach(dataStore.profiles) { profile in
-                            Text(profile.name).tag(profile.id as UUID?)
+        NavigationStack {
+            SwiftUI.Form {
+                SwiftUI.Section(header: Text("Profile")) {
+                    Picker("Select Profile", selection: $datastore.selectedProfile) {
+                        ForEach(datastore.profiles, id: \.self) { profile in
+                            Text(profile.tagProfile).tag(profile)
                         }
                     }
                 }
 
-                Section(header: Text("Categories")) {
-                    ForEach(dataStore.categories) { category in
-                        HStack {
-                            Image(systemName: category.systemImage)
-                            Text(category.name)
-                        }
+                SwiftUI.Section(header: Text("Categories")) {
+                    ForEach(datastore.categories, id: \.self) { category in
+                        Text(category)
                     }
                 }
 
-                Section(header: Text("Custom Words")) {
-                    Button("Clear Words for Current Profile") {
-                        dataStore.clearCustomWordsForCurrentProfile()
+                SwiftUI.Section(header: Text("Options")) {
+                    Toggle(isOn: $datastore.isGrouped) {
+                        Text("Grouped")
                     }
-                    .foregroundColor(.red)
                 }
             }
             .navigationTitle("Settings")
+            .formStyle(.grouped) // ✅ Explicit style, no closure
         }
     }
 }

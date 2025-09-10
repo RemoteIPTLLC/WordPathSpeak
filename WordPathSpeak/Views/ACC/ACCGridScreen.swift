@@ -1,28 +1,24 @@
 import SwiftUI
 
-/// Top level AAC screen: search, category chips, grid of word tiles, play/clear bar.
 struct AACGridScreen: View {
     @EnvironmentObject private var store: DataStore
 
     @State private var query: String = ""
     @State private var selectedCategory: WordCategory? = nil
 
-    // grid layout
     private let columns: [GridItem] = Array(repeating: GridItem(.flexible(), spacing: 16), count: 4)
 
     var body: some View {
         VStack(spacing: 0) {
             actionBar()
-
             categoryChips()
-
             searchBar()
 
             ScrollView {
                 LazyVGrid(columns: columns, spacing: 16) {
                     ForEach(filteredWords(), id: \.id) { item in
                         WordTile(item: item) {
-                            store.appendToUtterance(item)
+                            store.addToUtterance(item)
                         }
                     }
                 }
@@ -40,7 +36,6 @@ private extension AACGridScreen {
     @ViewBuilder
     func actionBar() -> some View {
         HStack(spacing: 12) {
-            // Play (green circle)
             Button(action: { store.speakUtterance() }) {
                 Image(systemName: "speaker.wave.2.fill")
                     .font(.system(size: 18, weight: .bold))
@@ -50,10 +45,9 @@ private extension AACGridScreen {
                     .accessibilityLabel("Play")
             }
 
-            // Current utterance chips (scrollable, light weight)
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 8) {
-                    ForEach(store.currentUtterance, id: \.id) { word in
+                    ForEach(store.composedUtterance, id: \.id) { word in
                         HStack(spacing: 6) {
                             if let icon = word.icon {
                                 Image(systemName: icon)
@@ -70,7 +64,6 @@ private extension AACGridScreen {
                 .padding(.vertical, 4)
             }
 
-            // Clear (orange circle)
             Button(action: { store.clearUtterance() }) {
                 Image(systemName: "trash.fill")
                     .font(.system(size: 18, weight: .bold))
@@ -108,15 +101,14 @@ private extension AACGridScreen {
 
     @ViewBuilder
     func categoryChips() -> some View {
-        // Simple list of chips across two rows if needed
-        let allCats = [WordCategory.core, .needs, .foodAndDrink, .people, .places, .actions, .feelings, .custom]
+        let allCats = WordCategory.allCases
         ScrollView(.horizontal, showsIndicators: false) {
             HStack(spacing: 8) {
                 chip(title: "All", isSelected: selectedCategory == nil) {
                     selectedCategory = nil
                 }
                 ForEach(allCats, id: \.self) { cat in
-                    chip(title: chipTitle(for: cat), isSelected: selectedCategory == cat) {
+                    chip(title: cat.displayName, isSelected: selectedCategory == cat) {
                         selectedCategory = cat
                     }
                 }
@@ -146,22 +138,8 @@ private extension AACGridScreen {
 
 // MARK: - Helpers
 private extension AACGridScreen {
-    func chipTitle(for category: WordCategory) -> String {
-        switch category {
-        case .core: return "Core"
-        case .needs: return "Needs"
-        case .foodAndDrink: return "Food & Drink"
-        case .people: return "People"
-        case .places: return "Places"
-        case .actions: return "Actions"
-        case .feelings: return "Feelings"
-        case .custom: return "Custom"
-        }
-    }
-
-    /// Keep it simple to help the type-checker: do filtering in small steps.
     func filteredWords() -> [WordItem] {
-        var items = store.items
+        var items = store.allWords
 
         if let cat = selectedCategory {
             items = items.filter { $0.category == cat }
@@ -170,10 +148,9 @@ private extension AACGridScreen {
         let q = query.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
         if !q.isEmpty {
             items = items.filter { item in
-                if item.label.lowercased().contains(q) { return true }
-                if let tags = item.tags, tags.contains(where: { $0.lowercased().contains(q) }) { return true }
-                if let syns = item.synonyms, syns.contains(where: { $0.lowercased().contains(q) }) { return true }
-                return false
+                item.label.lowercased().contains(q)
+                || item.tags.contains(where: { $0.lowercased().contains(q) })
+                || item.synonyms.contains(where: { $0.lowercased().contains(q) })
             }
         }
         return items
