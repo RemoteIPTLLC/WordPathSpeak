@@ -9,6 +9,9 @@ final class DataStore: ObservableObject {
     @Published var wordsCount: Int = 0
     @Published var isFullyLoaded: Bool = false
     @Published var currentProfile: String? = nil
+    @Published var profiles: [Profile] = []
+    @Published var categories: [String] = []
+    @Published var isGrouped: Bool = false
 
     let composer = UtteranceComposer()
     private let wordBank = WordBankService()
@@ -32,6 +35,10 @@ final class DataStore: ObservableObject {
             self.wordsCount = self.allWords.count
             self.isFullyLoaded = true
         }
+
+        // Example seed data
+        self.profiles = [Profile(name: "Default"), Profile(name: "Guest")]
+        self.categories = ["Food", "Actions", "Objects"]
     }
 
     func filter(query: String) {
@@ -65,9 +72,13 @@ final class DataStore: ObservableObject {
         filter(query: searchText)
     }
 
-    // Utterance passthrough
     var composedUtterance: [WordItem] { composer.composed }
     func addToUtterance(_ item: WordItem) { composer.add(item) }
     func clearUtterance() { composer.clear() }
     func speakUtterance() { composer.speak() }
+}
+
+struct Profile: Identifiable, Hashable {
+    var id = UUID()
+    var name: String
 }

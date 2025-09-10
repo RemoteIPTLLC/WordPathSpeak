@@ -7,9 +7,9 @@ struct SettingsView: View {
         NavigationStack {
             Form {
                 Section(header: Text("Profile")) {
-                    Picker("Select Profile", selection: $datastore.selectedProfile) {
-                        ForEach(datastore.profiles, id: \.self) { profile in
-                            Text(profile.tagProfile).tag(profile)
+                    Picker("Select Profile", selection: $datastore.currentProfile) {
+                        ForEach(datastore.profiles, id: \.name) { profile in
+                            Text(profile.name).tag(profile.name)
                         }
                     }
                 }
@@ -21,13 +21,11 @@ struct SettingsView: View {
                 }
 
                 Section(header: Text("Options")) {
-                    Toggle(isOn: $datastore.isGrouped) {
-                        Text("Grouped")
-                    }
+                    Toggle("Grouped", isOn: $datastore.isGrouped)
                 }
             }
             .navigationTitle("Settings")
-            .formStyle(.grouped) // ✅ Concrete value, no closure
+            .formStyle(.grouped)
         }
     }
 }
