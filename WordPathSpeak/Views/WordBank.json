@@ -1,0 +1,15 @@
+//
+//  Untitled.swift
+//  WordPathSpeak
+//
+//  Created by Steven Mahathirath on 9/3/25.
+//
+[
+  {"text":"banana","symbol":"leaf.fill","emoji":"🍌","assetName":null,"recordedAudio":null,"category":"Food & Drink"},
+  {"text":"juice","symbol":"cup.and.saucer.fill","emoji":"🧃","assetName":null,"recordedAudio":null,"category":"Food & Drink"},
+  {"text":"nurse","symbol":"cross.case.fill","emoji":"👩‍⚕️","assetName":null,"recordedAudio":null,"category":"People"},
+  {"text":"bus","symbol":"bus.fill","emoji":"🚌","assetName":null,"recordedAudio":null,"category":"Places"},
+  {"text":"swing","symbol":"figure.play","emoji":"🪁","assetName":null,"recordedAudio":null,"category":"Actions"},
+  {"text":"angry","symbol":"face.angry","emoji":"😠","assetName":null,"recordedAudio":null,"category":"Feelings"}
+]
+
